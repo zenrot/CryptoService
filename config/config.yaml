@@ -1,0 +1,4 @@
+coingeckoKey: "CG-5dg5h35rVUQusTuKFCFwurnF"
+http-config:
+  jwt_key: "asdsaddadasdasdasd"
+  address: "localhost:8080"
