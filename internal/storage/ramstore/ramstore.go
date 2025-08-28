@@ -80,7 +80,7 @@ func (rs *ramStorage) GetCrypto(symbol string) ([]storage.CryptoVal, error) {
 func (rs *ramStorage) GetLatestCrypto() (map[string]storage.CryptoVal, error) {
 	rs.mu.RLock()
 	defer rs.mu.RUnlock()
-	res := make(map[string]storage.CryptoVal, 0)
+	res := make(map[string]storage.CryptoVal)
 	for _, val := range rs.cryptoData {
 		t, ok := val.Last()
 		if !ok {

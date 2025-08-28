@@ -5,8 +5,11 @@ import (
 	"CryptoService/internal/config"
 	http_server "CryptoService/internal/http-server"
 	"CryptoService/internal/priceUpdater/priceUpdaterMultithreaded"
+	"CryptoService/internal/storage"
+	"CryptoService/internal/storage/postgresStorage"
 	"CryptoService/internal/storage/ramstore"
 	"flag"
+	"log"
 )
 
 var configPath string
@@ -17,18 +20,32 @@ func init() {
 
 func main() {
 	cfg := config.MustLoad(configPath)
-	storage := ramstore.NewRamStorage()
-	pu := priceUpdaterMultithreaded.NewPriceUpdaterMultithreaded(cfg, storage)
+	var store storage.Storage
+	if cfg.StorageType == "postgres" {
+		var err error
+		store, err = postgresStorage.NewPostgresStorage(cfg)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		store = ramstore.NewRamStorage()
+	}
 
-	//if err := priceUpdater.AddCryptoTracking("BTC"); err != nil {
-	//	fmt.Println(err)
+	//if err = storage.RegisterUser("leh", "1234"); err != nil {
+	//	log.Fatal(err)
 	//}
-	//if err := priceUpdater.AddCryptoTracking("BTC"); err != nil {
-	//	fmt.Println(err)
+	//
+	//user, err := storage.LoginUser("leh", "1234")
+	//if err != nil {
+	//	log.Fatal(err)
 	//}
-	auth := internalAuth.NewAuthorizer(storage, cfg.JwtKey)
+	//fmt.Println(user)
 
-	serv := http_server.NewHttpRouter(cfg, storage, pu, auth)
+	pu := priceUpdaterMultithreaded.NewPriceUpdaterMultithreaded(cfg, store)
+
+	auth := internalAuth.NewAuthorizer(store, cfg.JwtKey)
+
+	serv := http_server.NewHttpRouter(cfg, store, pu, auth)
 	serv.Start()
 
 }

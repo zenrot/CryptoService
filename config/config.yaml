@@ -1,4 +1,11 @@
 coingeckoKey: "CG-5dg5h35rVUQusTuKFCFwurnF"
+storage_type: "postgres"
 http-config:
   jwt_key: "asdsaddadasdasdasd"
   address: "localhost:8080"
+postgres-storage:
+  host: "localhost"
+  port: "5432"
+  user: "alexey"
+  password: ""
+  dbname: "crypto_service"
