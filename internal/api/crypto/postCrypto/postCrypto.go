@@ -1,10 +1,10 @@
 package postCrypto
 
 import (
-	"CryptoService/internal/api/crypto/getCrypto"
-	"CryptoService/internal/priceUpdater"
-	"CryptoService/internal/storage"
 	"github.com/gin-gonic/gin"
+	"github.com/zenrot/CryptoService/internal/api/crypto/getCrypto"
+	"github.com/zenrot/CryptoService/internal/priceUpdater"
+	"github.com/zenrot/CryptoService/internal/storage"
 	"net/http"
 	"strings"
 	"time"
@@ -14,7 +14,7 @@ type requestPostCrypto struct {
 	Symbol string `json:"symbol"`
 }
 
-func CryptoPostHandler(store storage.Storage, updater priceUpdater.PriceUpdater) gin.HandlerFunc {
+func CryptoPostHandler(store storage.Crypto, updater priceUpdater.PriceUpdater) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req requestPostCrypto
 		if err := c.ShouldBindJSON(&req); err != nil {

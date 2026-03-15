@@ -1,0 +1,24 @@
+syntax = "proto3";
+package authGrpc;
+
+option go_package = "github.com/zenrot/CryptoService/internal/auth/grpcAuth/protoc;protocAuth";
+
+service Authorizer{
+  rpc AuthenticateUser(UserInfo) returns (TokenStr);
+  rpc RegisterUser(UserInfo) returns (TokenStr);
+  rpc AuthorizeUser(TokenStr) returns (Error);
+}
+
+
+message UserInfo{
+  string name = 1;
+  string password = 2;
+}
+
+message TokenStr{
+  string token = 1;
+}
+
+message Error{
+  string error = 1;
+}

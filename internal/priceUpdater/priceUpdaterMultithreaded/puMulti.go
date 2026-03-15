@@ -1,22 +1,23 @@
 package priceUpdaterMultithreaded
 
 import (
-	"CryptoService/internal/config"
-	"CryptoService/internal/priceUpdater"
-	"CryptoService/internal/storage"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/zenrot/CryptoService/internal/config"
+	"github.com/zenrot/CryptoService/internal/priceUpdater"
+	"github.com/zenrot/CryptoService/internal/storage"
 )
 
 type priceUpdaterInternal struct {
 	apiKey     string
 	numWorkers int
 	autoUpdate time.Duration
-	store      storage.Storage
+	store      storage.Crypto
 	coins      map[string]priceUpdater.CoinInfo
 	lastUpdate time.Time
 
@@ -30,7 +31,7 @@ type priceUpdaterInternal struct {
 	mu                    sync.RWMutex
 }
 
-func NewPriceUpdaterMultithreaded(cfg *config.Config, store storage.Storage) *priceUpdaterInternal {
+func New(cfg *config.Config, store storage.Crypto) *priceUpdaterInternal {
 	return &priceUpdaterInternal{
 		apiKey:     cfg.CoingeckoKey,
 		autoUpdate: 3 * time.Second,

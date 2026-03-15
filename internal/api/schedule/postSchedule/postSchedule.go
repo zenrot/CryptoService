@@ -1,8 +1,8 @@
 package postSchedule
 
 import (
-	"CryptoService/internal/priceUpdater"
 	"github.com/gin-gonic/gin"
+	"github.com/zenrot/CryptoService/internal/priceUpdater"
 	"time"
 )
 

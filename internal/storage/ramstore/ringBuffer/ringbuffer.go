@@ -1,6 +1,6 @@
 package ringBuffer
 
-import "CryptoService/internal/storage"
+import "github.com/zenrot/CryptoService/internal/storage"
 
 type RingBuffer struct {
 	data  []storage.CryptoVal

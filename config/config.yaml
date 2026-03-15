@@ -1,8 +1,8 @@
 coingeckoKey: "CG-5dg5h35rVUQusTuKFCFwurnF"
-storage_type: "postgres"
+authorizer_type: "internal"
 http-config:
   jwt_key: "asdsaddadasdasdasd"
-  address: "localhost:8080"
+  address: "localhost:8090"
 postgres-storage:
   host: "localhost"
   port: "5432"

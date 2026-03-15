@@ -1,15 +1,16 @@
 package postgresStorage
 
 import (
-	"CryptoService/internal/config"
-	"CryptoService/internal/crypt"
-	"CryptoService/internal/storage"
 	"database/sql"
 	"fmt"
-	_ "github.com/lib/pq"
 	"math"
 	"sync"
 	"time"
+
+	_ "github.com/lib/pq"
+	"github.com/zenrot/CryptoService/internal/config"
+	"github.com/zenrot/CryptoService/internal/crypt"
+	"github.com/zenrot/CryptoService/internal/storage"
 )
 
 type postgresStorage struct {
@@ -19,7 +20,7 @@ type postgresStorage struct {
 	db             *sql.DB
 }
 
-func NewPostgresStorage(cfg *config.Config) (*postgresStorage, error) {
+func NewPostgresStorageFull(cfg *config.Config) (*postgresStorage, error) {
 	pc := cfg.PostgresConfig
 	var psqlInfo string
 	if pc.Password == "" {
@@ -52,6 +53,111 @@ func NewPostgresStorage(cfg *config.Config) (*postgresStorage, error) {
 	if err != nil {
 		return nil, err
 	}
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS crypto_info (
+    crypto_id serial PRIMARY KEY,
+    name text NOT NULL UNIQUE,
+    symbol text NOT NULL
+);`)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS crypto_prices (
+    crypto_id int NOT NULL,
+    price float NOT NULL,
+    timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(crypto_id) REFERENCES crypto_info(crypto_id)
+);`)
+	if err != nil {
+		return nil, err
+	}
+	symbToIDmap := make(map[string]int)
+	rows, err := db.Query(`SELECT crypto_id, symbol FROM crypto_info WHERE crypto_id IS NOT NULL`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id int
+		var symbol string
+		err = rows.Scan(&id, &symbol)
+		if err != nil {
+			return nil, err
+		}
+		symbToIDmap[symbol] = id
+	}
+	return &postgresStorage{
+		symbToIDmap:    symbToIDmap,
+		postgresConfig: &cfg.PostgresConfig,
+		db:             db,
+	}, nil
+}
+
+func NewAuth(cfg *config.Config) (*postgresStorage, error) {
+	pc := cfg.PostgresConfig
+	var psqlInfo string
+	if pc.Password == "" {
+		psqlInfo = fmt.Sprintf(
+			"host=%s port=%s user=%s dbname=%s sslmode=disable",
+			pc.Host, pc.Port, pc.User, pc.Dbname,
+		)
+	} else {
+		psqlInfo = fmt.Sprintf(
+			"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+			pc.Host, pc.Port, pc.User, pc.Password, pc.Dbname,
+		)
+	}
+
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		return nil, err
+	}
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
+       user_name text NOT NULL UNIQUE,
+       password text NOT NULL,
+	   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+       PRIMARY KEY(user_name)
+);`)
+	if err != nil {
+		return nil, err
+	}
+
+	return &postgresStorage{
+		symbToIDmap:    nil,
+		postgresConfig: &cfg.PostgresConfig,
+		db:             db,
+	}, nil
+}
+
+func NewCrypto(cfg *config.Config) (*postgresStorage, error) {
+	pc := cfg.PostgresConfig
+	var psqlInfo string
+	if pc.Password == "" {
+		psqlInfo = fmt.Sprintf(
+			"host=%s port=%s user=%s dbname=%s sslmode=disable",
+			pc.Host, pc.Port, pc.User, pc.Dbname,
+		)
+	} else {
+		psqlInfo = fmt.Sprintf(
+			"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+			pc.Host, pc.Port, pc.User, pc.Password, pc.Dbname,
+		)
+	}
+
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		return nil, err
+	}
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS crypto_info (
     crypto_id serial PRIMARY KEY,
     name text NOT NULL UNIQUE,

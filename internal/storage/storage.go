@@ -26,14 +26,22 @@ type CryptoStat struct {
 	RecordsCount       int     `json:"records_count"`
 }
 
-type Storage interface {
+type Auth interface {
 	RegisterUser(name, password string) error
 	LoginUser(name, password string) (*User, error)
+}
+
+type Crypto interface {
 	AddCrypto(symbol, name string, price float64, time time.Time) error
 	GetCrypto(symbol string) ([]CryptoVal, error)
 	DeleteCrypto(symbol string) error
 	GetLatestCrypto() (map[string]CryptoVal, error)
 	GetCryptoStats(symbol string) (CryptoStat, error)
+}
+
+type AuthCrypto interface {
+	Auth
+	Crypto
 }
 
 var (

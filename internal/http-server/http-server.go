@@ -1,39 +1,42 @@
 package http_server
 
 import (
-	"CryptoService/internal/api/auth/postAuth"
-	"CryptoService/internal/api/crypto/deleteCrypto"
-	"CryptoService/internal/api/crypto/getCrypto"
-	"CryptoService/internal/api/crypto/postCrypto"
-	"CryptoService/internal/api/crypto/putCrypto"
-	"CryptoService/internal/api/middleware/authMiddleware"
-	"CryptoService/internal/api/schedule/getSchedule"
-	"CryptoService/internal/api/schedule/postSchedule"
-	"CryptoService/internal/api/schedule/putSchedule"
-	"CryptoService/internal/auth"
-	"CryptoService/internal/auth/internalAuth"
-	"CryptoService/internal/config"
-	"CryptoService/internal/priceUpdater"
-	"CryptoService/internal/priceUpdater/priceUpdaterMultithreaded"
-	"CryptoService/internal/storage"
-	"CryptoService/internal/storage/ramstore"
 	"github.com/gin-gonic/gin"
+	"github.com/zenrot/CryptoService/internal/api/auth/postAuth"
+	"github.com/zenrot/CryptoService/internal/api/crypto/deleteCrypto"
+	"github.com/zenrot/CryptoService/internal/api/crypto/getCrypto"
+	"github.com/zenrot/CryptoService/internal/api/crypto/postCrypto"
+	"github.com/zenrot/CryptoService/internal/api/crypto/putCrypto"
+	"github.com/zenrot/CryptoService/internal/api/middleware/authMiddleware"
+	"github.com/zenrot/CryptoService/internal/api/schedule/getSchedule"
+	"github.com/zenrot/CryptoService/internal/api/schedule/postSchedule"
+	"github.com/zenrot/CryptoService/internal/api/schedule/putSchedule"
+	"github.com/zenrot/CryptoService/internal/auth"
+	"github.com/zenrot/CryptoService/internal/auth/internalAuth"
+	"github.com/zenrot/CryptoService/internal/config"
+	"github.com/zenrot/CryptoService/internal/priceUpdater"
+	"github.com/zenrot/CryptoService/internal/priceUpdater/priceUpdaterMultithreaded"
+	"github.com/zenrot/CryptoService/internal/storage"
+	"github.com/zenrot/CryptoService/internal/storage/ramstore"
 )
 
 type httpServer struct {
 	httpCfg      *config.HttpConfig
 	router       *gin.Engine
-	store        storage.Storage
+	store        storage.Crypto
 	auth         auth.Authorizer
 	priceUpdater priceUpdater.PriceUpdater
 }
 
 func NewHttpRouterNoConfig() *httpServer {
-	store := ramstore.NewRamStorage()
+	store, err := ramstore.NewRamStorage()
+	if err != nil {
+		return nil
+	}
 	jwtKey := "test"
 	config := &config.Config{
 		CoingeckoKey: "5dg5h35rVUQusTuKFCFwurnF",
-		StoragePath:  "",
+		StorageType:  "",
 		HttpConfig: config.HttpConfig{
 			JwtKey:  jwtKey,
 			Address: "localhost:8000",
@@ -43,11 +46,11 @@ func NewHttpRouterNoConfig() *httpServer {
 		httpCfg:      &config.HttpConfig,
 		router:       gin.Default(),
 		store:        store,
-		auth:         internalAuth.NewAuthorizer(store, jwtKey),
-		priceUpdater: priceUpdaterMultithreaded.NewPriceUpdaterMultithreaded(config, store),
+		auth:         internalAuth.New(store, jwtKey),
+		priceUpdater: priceUpdaterMultithreaded.New(config, store),
 	}
 }
-func NewHttpRouter(cfg *config.Config, store storage.Storage, updater priceUpdater.PriceUpdater, authorizer auth.Authorizer) *httpServer {
+func New(cfg *config.Config, store storage.Crypto, updater priceUpdater.PriceUpdater, authorizer auth.Authorizer) *httpServer {
 	return &httpServer{
 		httpCfg:      &cfg.HttpConfig,
 		router:       gin.Default(),

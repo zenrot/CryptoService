@@ -1,10 +1,10 @@
 package ramstore
 
 import (
-	"CryptoService/internal/crypt"
-	"CryptoService/internal/storage"
-	"CryptoService/internal/storage/ramstore/ringBuffer"
 	"fmt"
+	"github.com/zenrot/CryptoService/internal/crypt"
+	"github.com/zenrot/CryptoService/internal/storage"
+	"github.com/zenrot/CryptoService/internal/storage/ramstore/ringBuffer"
 	"math"
 	"sync"
 	"time"
@@ -18,11 +18,11 @@ type ramStorage struct {
 
 const maxHistory = 100
 
-func NewRamStorage() *ramStorage {
+func NewRamStorage() (*ramStorage, error) {
 	return &ramStorage{
 		userData:   make(map[string]storage.User),
 		cryptoData: make(map[string]*ringBuffer.RingBuffer),
-	}
+	}, nil
 }
 
 func (rs *ramStorage) RegisterUser(name, password string) error {

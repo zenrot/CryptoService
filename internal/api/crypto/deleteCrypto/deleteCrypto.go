@@ -1,13 +1,13 @@
 package deleteCrypto
 
 import (
-	"CryptoService/internal/priceUpdater"
-	"CryptoService/internal/storage"
 	"github.com/gin-gonic/gin"
+	"github.com/zenrot/CryptoService/internal/priceUpdater"
+	"github.com/zenrot/CryptoService/internal/storage"
 	"net/http"
 )
 
-func CryptoDeleteSymbolHandler(store storage.Storage, updater priceUpdater.PriceUpdater) gin.HandlerFunc {
+func CryptoDeleteSymbolHandler(store storage.Crypto, updater priceUpdater.PriceUpdater) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		symbol := c.Param("symbol")
 		if err := updater.DeleteCryptoTracking(symbol); err != nil {

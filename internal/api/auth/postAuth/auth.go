@@ -1,8 +1,8 @@
 package postAuth
 
 import (
-	"CryptoService/internal/auth"
 	"github.com/gin-gonic/gin"
+	"github.com/zenrot/CryptoService/internal/auth"
 	"net/http"
 )
 

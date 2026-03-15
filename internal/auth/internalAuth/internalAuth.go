@@ -1,9 +1,9 @@
 package internalAuth
 
 import (
-	"CryptoService/internal/storage"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/zenrot/CryptoService/internal/storage"
 	"time"
 )
 
@@ -12,11 +12,11 @@ type internalCustomClaims struct {
 	jwt.RegisteredClaims
 }
 type internalAuthorizer struct {
-	Store  storage.Storage
+	Store  storage.Auth
 	JwtKey string
 }
 
-func NewAuthorizer(store storage.Storage, jwtKey string) *internalAuthorizer {
+func New(store storage.Auth, jwtKey string) *internalAuthorizer {
 	return &internalAuthorizer{
 		Store:  store,
 		JwtKey: jwtKey,
@@ -54,7 +54,7 @@ func (au *internalAuthorizer) RegisterUser(name, password string) (string, error
 	return au.AuthenticateUser(name, password)
 }
 
-func (au *internalAuthorizer) AuthorizeUser(tokenString string) (*jwt.Token, error) {
+func (au *internalAuthorizer) AuthorizeUser(tokenString string) error {
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -64,12 +64,12 @@ func (au *internalAuthorizer) AuthorizeUser(tokenString string) (*jwt.Token, err
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("invalid token: %v", err)
+		return fmt.Errorf("invalid token: %v", err)
 	}
 
 	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return token, nil
+		return nil
 	}
 
-	return nil, fmt.Errorf("invalid token claims")
+	return fmt.Errorf("invalid token claims")
 }

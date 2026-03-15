@@ -1,9 +1,9 @@
 package getCrypto
 
 import (
-	"CryptoService/internal/storage"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/zenrot/CryptoService/internal/storage"
 	"net/http"
 	"strings"
 	"time"
@@ -16,7 +16,7 @@ type ResponseCrypto struct {
 	LastUpdated  string  `json:"last_updated"`
 }
 
-func CryptoGetHandler(store storage.Storage) gin.HandlerFunc {
+func CryptoGetHandler(store storage.Crypto) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		val, _ := store.GetLatestCrypto()
 		res := make([]ResponseCrypto, len(val))
@@ -34,7 +34,7 @@ func CryptoGetHandler(store storage.Storage) gin.HandlerFunc {
 	}
 }
 
-func CryptoSymbolGetHandler(store storage.Storage) gin.HandlerFunc {
+func CryptoSymbolGetHandler(store storage.Crypto) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		symbol := c.Param("symbol")
 		val, _ := store.GetLatestCrypto()
@@ -59,7 +59,7 @@ type responseGetHistory struct {
 	Time  string  `json:"timestamp"`
 }
 
-func CryptoSymbolGetHistoryHandler(store storage.Storage) gin.HandlerFunc {
+func CryptoSymbolGetHistoryHandler(store storage.Crypto) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		symbol := c.Param("symbol")
 
@@ -83,7 +83,7 @@ func CryptoSymbolGetHistoryHandler(store storage.Storage) gin.HandlerFunc {
 	}
 }
 
-func CryptoSymbolGetStatsHandler(store storage.Storage) gin.HandlerFunc {
+func CryptoSymbolGetStatsHandler(store storage.Crypto) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		symbol := c.Param("symbol")
 		if val, err := store.GetCryptoStats(symbol); err != nil {

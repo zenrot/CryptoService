@@ -1,17 +1,17 @@
 package putCrypto
 
 import (
-	"CryptoService/internal/api/crypto/getCrypto"
-	"CryptoService/internal/priceUpdater"
-	"CryptoService/internal/storage"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/zenrot/CryptoService/internal/api/crypto/getCrypto"
+	"github.com/zenrot/CryptoService/internal/priceUpdater"
+	"github.com/zenrot/CryptoService/internal/storage"
 	"net/http"
 	"strings"
 	"time"
 )
 
-func CryptoPutSymbolRefresh(store storage.Storage, updater priceUpdater.PriceUpdater) gin.HandlerFunc {
+func CryptoPutSymbolRefresh(store storage.Crypto, updater priceUpdater.PriceUpdater) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		symbol := c.Param("symbol")
 

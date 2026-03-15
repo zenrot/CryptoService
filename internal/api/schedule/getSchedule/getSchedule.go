@@ -1,9 +1,9 @@
 package getSchedule
 
 import (
-	"CryptoService/internal/api/schedule"
-	"CryptoService/internal/priceUpdater"
 	"github.com/gin-gonic/gin"
+	"github.com/zenrot/CryptoService/internal/api/schedule"
+	"github.com/zenrot/CryptoService/internal/priceUpdater"
 	"net/http"
 	"strconv"
 	"time"
